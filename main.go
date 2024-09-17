@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	
+
 	godotenv.Load()
 	portString := os.Getenv("PORT")
 	if portString == "" {
@@ -33,6 +33,12 @@ func main() {
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Welcome to the Go RSS feed aggregator!")
 	})
+
+	v1Router := chi.NewRouter()
+	v1Router.Get("/healthz", handlerReadiness)
+	v1Router.Get("/err", handlerErr)
+
+	router.Mount("/v1", v1Router)
 
 	server := &http.Server{
 		Addr:    ":" + portString,
