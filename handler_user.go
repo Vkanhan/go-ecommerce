@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Vkanhan/go-aggregator/internal/auth"
 	"github.com/Vkanhan/go-aggregator/internal/database"
 	"github.com/google/uuid"
 )
@@ -46,18 +45,6 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 }
 
 // handlerGetUser retrieves a user based on the API key provided in the request header.
-func (apiCfg *apiConfig) handlerGetUser(w http.ResponseWriter, r *http.Request) {
-	apiKey, err := auth.GetAPIKey(r.Header)
-	if err != nil {
-		respondWithError(w, http.StatusUnauthorized, fmt.Sprintf("Missing or invalid API key: %v", err))
-		return
-	}
-
-	// Fetch the user from the database using the API key.
-	user, err := apiCfg.DB.GetUserByAPIKey(r.Context(), apiKey)
-	if err != nil {
-		respondWithError(w, http.StatusNotFound, fmt.Sprintf("User not found: %v", err))
-		return
-	}
+func (apiCfg *apiConfig) handlerGetUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	respondWithJSON(w, http.StatusOK, databaseUserToUse(user))
 }
