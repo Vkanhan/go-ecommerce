@@ -17,15 +17,18 @@ func (apiCfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Reques
 		URL  string `json:"url"`
 	}
 
-	params := parameters{}
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&params)
+	var params parameters
+	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid JSON request body")
 		return 
 	}
 
-	// Create the feed
+	if params.Name == "" || params.URL == "" {
+		respondWithError(w, http.StatusBadRequest, "Feed name and URL are required")
+		return 
+	}
+
 	feed, err := apiCfg.DB.CreateFeed(r.Context(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
@@ -40,10 +43,10 @@ func (apiCfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// Respond with the created feed
 	respondWithJSON(w, http.StatusCreated, databaseFeedToFeed(feed))
 }
 
+// GetFeeds retrieves all feeds from the database for the user.
 func (apiCfg *apiConfig) GetFeeds(w http.ResponseWriter, r *http.Request) {
 	feeds, err := apiCfg.DB.GetFeeds(r.Context())
 	if err != nil {
@@ -51,6 +54,5 @@ func (apiCfg *apiConfig) GetFeeds(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Respond with the created feed
 	respondWithJSON(w, http.StatusCreated, databaseFeedstoReturn(feeds))
 }

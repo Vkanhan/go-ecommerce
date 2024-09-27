@@ -16,27 +16,25 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 		Name string `json:"name"`
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err := decoder.Decode(&params)
+	var params parameters
+	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
 		respondWithError(w, http.StatusUnprocessableEntity, fmt.Sprintf("Invalid JSON: %v", err))
 		return
 	}
 
-	// Input validation
 	if params.Name == "" {
 		respondWithError(w, http.StatusBadRequest, "Name is required")
 		return
 	}
 
-	// Create the user with a UUID and current timestamp.
 	user, err := apiCfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 		Name:      params.Name,
 	})
+	
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to create user: %v", err))
 		return

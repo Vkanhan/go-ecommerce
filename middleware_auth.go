@@ -10,6 +10,7 @@ import (
 
 type authedHandler func(http.ResponseWriter, *http.Request, database.User)
 
+//middlewareAuth authnticates the user based on the API key provided.
 func (apiCfg *apiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get API key from headers
@@ -25,7 +26,6 @@ func (apiCfg *apiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc 
 			respondWithError(w, http.StatusNotFound, fmt.Sprintf("Invalid user credentials: %v", err))
 			return
 		}
-		// Pass user to the handler
 		handler(w, r, user)
 	}
 }
