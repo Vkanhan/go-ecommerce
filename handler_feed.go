@@ -21,18 +21,20 @@ func (apiCfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Reques
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid JSON request body")
-		return 
+		return
 	}
 
 	if params.Name == "" || params.URL == "" {
 		respondWithError(w, http.StatusBadRequest, "Feed name and URL are required")
-		return 
+		return
 	}
+
+	now := time.Now().UTC()
 
 	feed, err := apiCfg.DB.CreateFeed(r.Context(), database.CreateFeedParams{
 		ID:        uuid.New(),
-		CreatedAt: time.Now().UTC(),
-		UpdatedAt: time.Now().UTC(),
+		CreatedAt: now,
+		UpdatedAt: now,
 		Name:      params.Name,
 		Url:       params.URL,
 		UserID:    user.ID,
