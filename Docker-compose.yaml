@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -11,7 +9,7 @@ services:
       - PORT=8080
       - DB_URL=postgres://postgres:postgres@db:5432/postgres?sslmode=disable
     depends_on:
-      -db
+      - db  
 
   db:
     image: postgres:latest
